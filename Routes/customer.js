@@ -9,7 +9,7 @@ import { mysqlPromisePool } from "../mysql_connection.js";
 export const customerRouter = Router();
 
 customerRouter.get("/" ,async (req , res)=>{
-    const [rows , fields ] = await mysqlPromisePool.query("select * from customer join acc_r on customer.id = acc_r.customer_id");
+    const [rows , fields ] = await mysqlPromisePool.query("select * from customer left join acc_r on customer.id = acc_r.customer_id");
     return res.json(rows)
 })
 

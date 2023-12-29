@@ -6,6 +6,8 @@ import express from "express"
 
 // ###### routes ####################
 import { customerRouter } from "./Routes/customer.js";
+import { vendorRouter } from "./Routes/vendor.js";
+import { purchaseInvoiceRouter } from "./Routes/purchase_invoice.js";
 
 //------------- server --------------------------------
 
@@ -15,6 +17,8 @@ app.use(express.json());
 
 // ############# Routes #################
 app.use("/customer" , customerRouter);
+app.use("/vendor" , vendorRouter);
+app.use("/purchase_invoice" , purchaseInvoiceRouter);
 
 // ################ Start the server ###################
 const port = process.env.PORT || 3000;
