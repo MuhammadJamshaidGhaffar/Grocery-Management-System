@@ -9,7 +9,7 @@ import { mysqlPromisePool } from "../mysql_connection.js";
 export const purchaseInvoiceRouter = Router();
 
 purchaseInvoiceRouter.get("/" ,async (req , res)=>{
-    const [rows , fields ] = await mysqlPromisePool.query("select Date , Name as vendorName , mode  from purchase_invoice join vendor on purchase_invoice.vendor_id = vendor.id");
+    const [rows , fields ] = await mysqlPromisePool.query("select purchase_invoice.id , Date , firstName , lastName , Total.totalAmount   from purchase_invoice join vendor on purchase_invoice.vendor_id = vendor.id join (select purchase_invoice_id ,  sum(sp) as totalAmount from purchase_invoice_products join product on product_id=product.id group by purchase_invoice_id ) AS Total on purchase_invoice.id=Total.purchase_invoice_id ");
     return res.json(rows)
 })
 

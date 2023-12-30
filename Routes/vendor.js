@@ -14,6 +14,7 @@ vendorRouter.get("/" ,async (req , res)=>{
 })
 
 vendorRouter.post("/" , async (req , res) =>{
+    console.log("Vendor Post called");
     const vendor = req.body; 
 
     try{
