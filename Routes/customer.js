@@ -27,7 +27,7 @@ customerRouter.post("/" , async (req , res) =>{
     const customer = req.body; 
 
     try{
-        const query = `insert into customer (Name , City , Contact , CreditLimit ) values  ( "${customer.name}" , "${customer.city}" , "${customer.contact}" , "${customer.creditLimit}" )`;
+        const query = `insert into customer (firstName, lastName , City , Contact , CreditLimit ) values  ( "${customer.firstName}" , "${customer.lastName}" , "${customer.city}" , "${customer.contact}" , "${customer.creditLimit}" )`;
         const [rows , fields ] = await mysqlPromisePool.query(query);
         return res.status(200).end();
     }
