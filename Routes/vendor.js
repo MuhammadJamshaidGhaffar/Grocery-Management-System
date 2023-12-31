@@ -9,14 +9,18 @@ import { mysqlPromisePool } from "../mysql_connection.js";
 export const vendorRouter = Router();
 
 vendorRouter.get("/" ,async (req , res)=>{
-    const [rows , fields ] = await mysqlPromisePool.query("select id , firstName , lastName , City , province , Contact  from vendor ");
+    // const [rows , fields ] = await mysqlPromisePool.query("select id , firstName , lastName , City , province , Contact  from vendor ");
+    const query = `select * from get_vendor`;
+    const [rows , fields ] = await mysqlPromisePool.query(query);
     return res.json(rows)
 })
 
 
 vendorRouter.get("/:id" ,async (req , res)=>{
-    const query = `select id ,firstName , lastName , City , province , Contact  from vendor  where vendor.id=${req.params.id}`;
-    console.log(query);
+    // const query = `select id ,firstName , lastName , City , province , Contact  from vendor  where vendor.id=${req.params.id}`;
+    // console.log(query);
+    // const [rows , fields ] = await mysqlPromisePool.query(query);
+    const query = `select * from get_vendor where id=${req.params.id}`;
     const [rows , fields ] = await mysqlPromisePool.query(query);
     return res.json(rows)
 })
@@ -27,8 +31,12 @@ vendorRouter.post("/" , async (req , res) =>{
 
     try{
         const query = `insert into vendor (firstName , lastName , City , Province , Contact) values ("${vendor.firstName}" , "${vendor.lastName}" , "${vendor.city}" , "${vendor.province}" , "${vendor.contact}" )`;
+        console.log(query);
         const [rows , fields ] = await mysqlPromisePool.query(query);
-        
+        // const query = `call InsertOrUpdateVendor( NULL , "${vendor.firstName}" , "${vendor.lastName}" , "${vendor.city}" , "${vendor.province}" , "${vendor.contact}" ) `;
+        // console.log(query);
+        // const [rows , fields ] = await mysqlPromisePool.query(query);
+        // console.log(rows);
         vendor.products.forEach(async (product) => {
             const query1 = `update product set vendor_id = ${rows.insertId} where id = ${product.id}`;
             console.log(query1);
@@ -49,6 +57,9 @@ vendorRouter.put("/" , async (req , res) =>{
         const query = `update vendor set firstName = "${vendor.firstName}"  , lastName = "${vendor.lastName}" , City = "${vendor.city}" , Province = "${vendor.province}" , Contact = "${vendor.contact}" where id = ${vendor.id}`;
         console.log(query);
         const [rows , fields ] = await mysqlPromisePool.query(query);
+        // const query = `call InsertOrUpdateVendor(${vendor.id}  , "${vendor.firstName}" , "${vendor.lastName}" , "${vendor.city}" , "${vendor.province}" , "${vendor.contact}" ) `;
+        // console.log(query);
+        // const [rows , fields ] = await mysqlPromisePool.query(query);
         
         vendor.products.forEach(async (product) => {
             const query1 = `update product set vendor_id = ${vendor.id} where id = ${product.id}`;

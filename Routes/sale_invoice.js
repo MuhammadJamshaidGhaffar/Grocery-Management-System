@@ -9,26 +9,31 @@ import { mysqlPromisePool } from "../mysql_connection.js";
 export const saleInvoiceRouter = Router();
 
 saleInvoiceRouter.get("/" ,async (req , res)=>{
-    const [rows , fields ] = await mysqlPromisePool.query("select sale_invoice.id , Date , firstName , lastName , Total.totalAmount   from sale_invoice join customer on sale_invoice.customer_id = customer.id left join (select sale_invoice_id ,  sum(sp) as totalAmount from sale_invoice_products join product on product_id=product.id group by sale_invoice_id ) AS Total on sale_invoice.id=Total.sale_invoice_id ");
+    // const [rows , fields ] = await mysqlPromisePool.query("select sale_invoice.id , Date , firstName , lastName , Total.totalAmount   from sale_invoice join customer on sale_invoice.customer_id = customer.id left join (select sale_invoice_id ,  sum(sp) as totalAmount from sale_invoice_products join product on product_id=product.id group by sale_invoice_id ) AS Total on sale_invoice.id=Total.sale_invoice_id ");
+    const query = `select * from viewsaleinvoice`;
+    const [rows , fields ] = await mysqlPromisePool.query(query);
     return res.json(rows)
 })
 
-// saleInvoiceRouter.get("/:id" , async (req , res)=>{
-//     try{
-//     const [rows , fields ] = await mysqlPromisePool.query(`select Date , Name as vendorName , mode from purchase_invoice join vendor on purchase_invoice.vendor_id = vendor.id where purchase_invoice.id =${req.params.id}`);
-//     const purchase_invoice = rows[0];
-//     // console.log(purchase_invoice);
-//     const [rows1 , fields1 ] = await mysqlPromisePool.query(`select * from purchase_invoice_products where purchase_invoice_id =${req.params.id}`);
-//     purchase_invoice.products = rows1.map(purchaseInvoiceProduct => {
-//         return {"product_id" : purchaseInvoiceProduct.product_id , "quantity" : purchaseInvoiceProduct.quantity };
-//     })
-//     // console.log(purchase_invoice);
-//     return res.json(purchase_invoice)
-//     }
-//     catch(err){
-//         res.status(404).json({"message":err.message});
-//     }
-// })
+saleInvoiceRouter.get("/:id" , async (req , res)=>{
+    try{
+    // const [rows , fields ] = await mysqlPromisePool.query(`select Date , Name as vendorName , mode from purchase_invoice join vendor on purchase_invoice.vendor_id = vendor.id where purchase_invoice.id =${req.params.id}`);
+    // const purchase_invoice = rows[0];
+    const query = `select * from viewsaleinvoice where id=${req.params.id}`;
+    const [rows , fields ] = await mysqlPromisePool.query(query);
+    const sale_invoice = rows[0];
+    // console.log(purchase_invoice);
+    const [rows1 , fields1 ] = await mysqlPromisePool.query(`select * from sale_invoice_products where sale_invoice_id =${req.params.id}`);
+    sale_invoice.products = rows1.map(saleInvoiceProduct => {
+        return {"product_id" : saleInvoiceProduct.product_id , "quantity" : saleInvoiceProduct.quantity };
+    })
+    // console.log(purchase_invoice);
+    return res.json(sale_invoice)
+    }
+    catch(err){
+        res.status(404).json({"message":err.message});
+    }
+})
 
 saleInvoiceRouter.post("/" , async (req , res) =>{
     const saleInvoice = req.body; 
