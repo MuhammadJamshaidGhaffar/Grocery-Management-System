@@ -1,9 +1,12 @@
 //------------- Imports --------------------------------
 // ####### packages ###########
 import { Router } from "express";
-
+import jwt from "jsonwebtoken"
+import dotenv from 'dotenv';
 //####### custom files ###############
 import { mysqlPromisePool } from "../mysql_connection.js";
+
+dotenv.config();
 
 // ------- code -----------------------
 export const employeeRouter = Router();
@@ -28,9 +31,20 @@ employeeRouter.post("/" , async (req , res) =>{
     const employee = req.body; 
 
     try{
-        const query = `insert into employee (firstName , lastName , City , Province , Contact , EStatus , CnicNo , salary ) values ("${employee.firstName}" , "${employee.lastName}" , "${employee.city}" , "${employee.province}" , "${employee.contact}" , "active" , "${employee.cnicNo}" , ${employee.salary})`;
+        const query = `
+            INSERT INTO employee 
+            (firstName, lastName, City, Province, Contact, EStatus, CnicNo, salary)
+            VALUES (?, ?, ?, ?, ?, 'active', ?, ?)`;
         console.log(query);
-        const [rows , fields ] = await mysqlPromisePool.query(query);
+        const [rows , fields ] = await mysqlPromisePool.query(query, [
+            employee.firstName,
+            employee.lastName,
+            employee.city,
+            employee.province,
+            employee.contact,
+            employee.cnicNo,
+            employee.salary
+          ]);
         return res.status(200).end();
     }
     catch(err){
@@ -54,9 +68,30 @@ employeeRouter.put("/" , async (req , res) =>{
     const employee = req.body; 
 
     try{
-        const query = `update employee set firstName="${employee.firstName}" , lastName="${employee.lastName}" , City="${employee.city}" , Province="${employee.province}" , Contact="${employee.contact}" , EStatus="${employee.eStatus}" , CnicNo="${employee.cnicNo}" , salary=${employee.salary} where id=${employee.id}`;
+        const query = `
+        UPDATE employee
+        SET 
+          firstName = ?,
+          lastName = ?,
+          City = ?,
+          Province = ?,
+          Contact = ?,
+          EStatus = ?,
+          CnicNo = ?,
+          salary = ?
+        WHERE id = ?`;
         console.log(query);
-        const [rows , fields ] = await mysqlPromisePool.query(query);
+        const [rows , fields ] = await mysqlPromisePool.query(query, [
+            employee.firstName,
+            employee.lastName,
+            employee.city,
+            employee.province,
+            employee.contact,
+            employee.eStatus,
+            employee.cnicNo,
+            employee.salary,
+            employee.id
+          ]);
         return res.status(200).end();
     }
     catch(err){
@@ -76,4 +111,31 @@ employeeRouter.put("/" , async (req , res) =>{
     "eStatus":"active"
 }
 */
+// Sample route for login and generating a token
+employeeRouter.post('/login', async (req, res) => {
+    // Validate credentials (replace with your authentication logic)
+    const {username , password } = req.body;
+    // Use placeholders in the query
+    const sql = 'SELECT id FROM employee WHERE username = ? AND password = ?';
+
+    try{
+        // Execute the query with parameters
+        const [rows, fields] = await mysqlPromisePool.query(sql, [username, password]);
+        console.log(rows);
+        if (rows.length > 0) {
+            // Generate a JWT
+            const token = jwt.sign({ username }, process.env.AUTH_SECRET, { expiresIn: '1h' });
+        
+            // Save the token in the session
+            req.session.token = token;
+        
+            res.json({ token });
+        } else {
+            res.status(401).json({ message: 'Invalid credentials' });
+        }
+    }
+    catch(err){
+        res.status(401).json({ message: err.message });
+    }
+  });
 

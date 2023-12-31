@@ -4,6 +4,8 @@ import express from "express"
 import cors from "cors";
 import morgan from "morgan";
 import cron from "node-cron"
+import session from "express-session";
+import dotenv from 'dotenv';
 
 //####### custom files ###############
 
@@ -16,8 +18,12 @@ import { saleInvoiceRouter } from "./Routes/sale_invoice.js";
 import { employeeRouter } from "./Routes/employee.js";
 import { acc_pRouter } from "./Routes/acc_p.js";
 import { acc_rRouter } from "./Routes/acc_r.js";
+import { checkToken } from "./auth.js";
+
+
 
 //------------- server --------------------------------
+dotenv.config();
 
 const app = express();
 
@@ -26,7 +32,14 @@ app.use(cors());
 app.use(express.json());
 // Use morgan middleware to log HTTP requests
 app.use(morgan('dev')); // 'dev' is a predefined format in morgan for colored output
+// Use sessions
+app.use(session({
+  secret: process.env.AUTH_SECRET, // Replace with a secure secret key
+  resave: false,
+  saveUninitialized: true,
+}));
 
+app.use(checkToken);
 
 // ############# Routes #################
 app.use("/customer" , customerRouter);
