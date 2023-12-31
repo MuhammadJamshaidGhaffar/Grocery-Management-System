@@ -2,6 +2,8 @@
 // ####### packages ###########
 import express from "express"
 import cors from "cors";
+import morgan from "morgan";
+import cron from "node-cron"
 
 //####### custom files ###############
 
@@ -22,6 +24,9 @@ const app = express();
 app.use(cors());
 // Middleware to parse JSON requests
 app.use(express.json());
+// Use morgan middleware to log HTTP requests
+app.use(morgan('dev')); // 'dev' is a predefined format in morgan for colored output
+
 
 // ############# Routes #################
 app.use("/customer" , customerRouter);
@@ -37,4 +42,10 @@ app.use("/acc_r" , acc_rRouter);
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
+});
+
+// Schedule daily backup at 12 AM
+cron.schedule('0 0 * * *', () => {
+  console.log('Scheduling daily backup...');
+  performBackup();
 });

@@ -44,7 +44,6 @@ productRouter.post("/clothes" , async (req , res) =>{
     "name" : "testCloth",
     "pp" : 10 ,
     "sp" : 20,
-    "vendor_id" : 1,
     "season" : "Summer",
     "category" : "shirt"
 }

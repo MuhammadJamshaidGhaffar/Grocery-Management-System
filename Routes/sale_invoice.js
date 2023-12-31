@@ -42,7 +42,7 @@ saleInvoiceRouter.post("/" , async (req , res) =>{
 
         //--------- checking if product exists -------------
         for(const product of saleInvoice.products){
-            const getProductsQuantityQuery = `select id , quantity from product where id=${product.id}`;
+            const getProductsQuantityQuery = `select id , quantity from get_product where id=${product.id}`;
             const [productQuantityRows , productsQuantityFields ] = await mysqlPromisePool.query(getProductsQuantityQuery);
             const fetchedProduct = productQuantityRows[0];
             // console.log(fetchedProduct);
