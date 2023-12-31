@@ -19,8 +19,9 @@ customerRouter.get("/" ,async (req , res)=>{
 customerRouter.get("/:id" , async (req , res)=>{
     try{
     // const [rows , fields ] = await mysqlPromisePool.query(`select * from customer where id=${req.params.id}`);
-    const query = `select * from view_all_cusotmers where id=${req.params.id}`;
-    const [rows , fields ] = await mysqlPromisePool.query(query);
+    const query = 'SELECT * FROM view_all_cusotmers WHERE id = ?';
+    const [rows, fields] = await mysqlPromisePool.query(query, [req.params.id]);
+
     return res.json(rows)
     }
     catch(err){
@@ -35,9 +36,17 @@ customerRouter.post("/" , async (req , res) =>{
         // const query = `insert into customer (firstName, lastName , City , Province, Contact  , CreditLimit ) values  ( "${customer.firstName}" , "${customer.lastName}" , "${customer.city}" , "${customer.province}" , "${customer.contact}" , "${customer.creditLimit}" )`;
         // console.log(query);
         // const [rows , fields ] = await mysqlPromisePool.query(query);
-        const query  = `call InsertOrUpdateCustomer( NULL , "${customer.firstName}" , "${customer.lastName}" , "${customer.city}" , "${customer.province}" , "${customer.contact}" , "${customer.creditLimit}" ) `;
+        const query = 'CALL InsertOrUpdateCustomer(NULL, ?, ?, ?, ?, ?, ?)';
         console.log(query);
-        const [rows , fields ] = await mysqlPromisePool.query(query);
+        const [rows, fields] = await mysqlPromisePool.query(query, [
+        customer.firstName,
+        customer.lastName,
+        customer.city,
+        customer.province,
+        customer.contact,
+        customer.creditLimit
+        ]);
+
         return res.status(200).end();
     }
     catch(err){
@@ -63,9 +72,18 @@ customerRouter.put("/" , async (req , res) =>{
         // const query = `update customer set firstName="${customer.firstName}" , lastName="${customer.lastName}" , City="${customer.city}" , Province="${customer.province}" , Contact="${customer.contact}"  , CreditLimit=${customer.creditLimit} where id=${customer.id} `;
         // console.log(query);
         // const [rows , fields ] = await mysqlPromisePool.query(query);
-        const query  = `call InsertOrUpdateCustomer(${customer.id}  , "${customer.firstName}" , "${customer.lastName}" , "${customer.city}" , "${customer.province}" , "${customer.contact}" , "${customer.creditLimit}" ) `;
+        const query = 'CALL InsertOrUpdateCustomer(?, ?, ?, ?, ?, ?, ?)';
         console.log(query);
-        const [rows , fields ] = await mysqlPromisePool.query(query);
+        const [rows, fields] = await mysqlPromisePool.query(query, [
+        customer.id,
+        customer.firstName,
+        customer.lastName,
+        customer.city,
+        customer.province,
+        customer.contact,
+        customer.creditLimit
+        ]);
+
         return res.status(200).end();
     }
     catch(err){

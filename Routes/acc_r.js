@@ -23,9 +23,10 @@ acc_rRouter.get("/" , async (req , res) =>{
 
 acc_rRouter.get("/:id" , async (req , res) =>{
     try{
-    const query = `select * from view_acc_r  where customer_id = ${req.params.id}`;
-    const [rows , fields ] = await mysqlPromisePool.query(query);
-    return res.json(rows);
+        const query = 'SELECT * FROM view_acc_r WHERE customer_id = ?';
+        const [rows, fields] = await mysqlPromisePool.query(query, [req.params.id]);
+        
+        return res.json(rows);
     }
     catch(err){
         return res.status(404).json({"message":err.message});

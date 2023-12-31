@@ -18,11 +18,12 @@ purchaseInvoiceRouter.get("/" ,async (req , res)=>{
 purchaseInvoiceRouter.get("/:id" , async (req , res)=>{
     try{
         // const [rows , fields ] = await mysqlPromisePool.query(`select Date , Name as vendorName , mode from purchase_invoice join vendor on purchase_invoice.vendor_id = vendor.id where purchase_invoice.id =${req.params.id}`);
-        const query = `select * from viewpurchaseinvoice where id=${req.params.id}`;
-        const [rows , fields ] = await mysqlPromisePool.query(query);
+        const query = 'SELECT * FROM viewpurchaseinvoice WHERE id = ?';
+        const [rows, fields] = await mysqlPromisePool.query(query, [req.params.id]);
+
         const purchase_invoice = rows[0];
         // console.log(purchase_invoice);
-        const [rows1 , fields1 ] = await mysqlPromisePool.query(`select * from purchase_invoice_products where purchase_invoice_id =${req.params.id}`);
+        const [rows1, fields1] = await mysqlPromisePool.query('SELECT * FROM purchase_invoice_products WHERE purchase_invoice_id = ?', [req.params.id]);
         purchase_invoice.products = rows1.map(purchaseInvoiceProduct => {
             return {"product_id" : purchaseInvoiceProduct.product_id , "quantity" : purchaseInvoiceProduct.quantity };
         })
@@ -39,11 +40,14 @@ purchaseInvoiceRouter.post("/" , async (req , res) =>{
 
     try{
         //--------- creating purchase invoice ----------------
-        const query = `insert into purchase_invoice (Date , vendor_id , mode ) values ('${purchaseInvoice.date}' , ${purchaseInvoice.vendor_id} , '${purchaseInvoice.mode}'); `;
-        const [rows , fields ] = await mysqlPromisePool.query(query);
+        const query = 'INSERT INTO purchase_invoice (Date, vendor_id, mode) VALUES (?, ?, ?)';
+        const [rows, fields] = await mysqlPromisePool.query(query, [purchaseInvoice.date, purchaseInvoice.vendor_id, purchaseInvoice.mode]);
+        
         const purchase_invoice_id = rows.insertId;
         purchaseInvoice.products.forEach( async (product) => {
-            const [rows1 , fields1 ] = await mysqlPromisePool.query(`insert into purchase_invoice_products values (${purchase_invoice_id}, ${product.id} , ${product.quantity});`);
+            const query2 = 'INSERT INTO purchase_invoice_products (purchase_invoice_id, product_id, quantity) VALUES (?, ?, ?)';
+            const [rows1, fields1] = await mysqlPromisePool.query(query2, [purchase_invoice_id, product.id, product.quantity]);
+
         });
         return res.status(200).end();
     }

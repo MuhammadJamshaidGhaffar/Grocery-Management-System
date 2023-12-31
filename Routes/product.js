@@ -15,8 +15,8 @@ productRouter.get("/" ,async (req , res)=>{
 
 productRouter.get("/:id" , async (req , res)=>{
     try{
-    const [rows , fields ] = await mysqlPromisePool.query(`select * from get_product where id =${req.params.id}`);
-    return res.json(rows)
+        const [rows, fields] = await mysqlPromisePool.query('SELECT * FROM get_product WHERE id = ?', [req.params.id]);
+        return res.json(rows);
     }
     catch(err){
         res.status(404).json({"message":err.message});
@@ -31,8 +31,14 @@ productRouter.post("/clothes" , async (req , res) =>{
         // const [rows , fields ] = await mysqlPromisePool.query(query);
         // const query1 = `insert into clothes values (${rows.insertId} , "${product.season}" , "${product.category}")`;
         // const [rows1 , fields1 ] = await mysqlPromisePool.query(query1);
-        const query = `call InsertProductWithClothes( "${product.name}" , ${product.pp}, ${product.sp} , "${product.season}" , "${product.category}" ) `;
-        const [rows , fields ] = await mysqlPromisePool.query(query);
+        const query = 'CALL InsertProductWithClothes(?, ?, ?, ?, ?)';
+        const [rows, fields] = await mysqlPromisePool.query(query, [
+            product.name,
+            product.pp,
+            product.sp,
+            product.season,
+            product.category
+          ]);
         return res.status(200).end();
     }
     catch(err){
@@ -57,9 +63,18 @@ productRouter.post("/cosmetics" , async (req , res) =>{
         // const [rows , fields ] = await mysqlPromisePool.query(query);
         // const query1 = `insert into cosmetics values (${rows.insertId} , "${product.brand}" , "${product.skinType}" , "${product.expiry}" , ${product.weight})`;
         // const [rows1 , fields1 ] = await mysqlPromisePool.query(query1);
-        const query = `call InsertProductWithCosmetics( "${product.name}" , ${product.pp}, ${product.sp} , "${product.brand}" , "${product.skinType}" , "${product.expiry}" , ${product.weight} )`;
+        const query = 'CALL InsertProductWithCosmetics(?, ?, ?, ?, ?, ?, ?)';
         console.log(query);
-        const [rows , fields ] = await mysqlPromisePool.query(query);
+
+        const [rows , fields ] = await mysqlPromisePool.query(query, [
+            product.name,
+            product.pp,
+            product.sp,
+            product.brand,
+            product.skinType,
+            product.expiry,
+            product.weight
+          ]);
         return res.status(200).end();
     }
     catch(err){
@@ -87,9 +102,16 @@ productRouter.post("/canned_food" , async (req , res) =>{
         // const [rows , fields ] = await mysqlPromisePool.query(query);
         // const query1 = `insert into canned_food values (${rows.insertId} , "${product.expiry}" , ${product.weight} )`;
         // const [rows1 , fields1 ] = await mysqlPromisePool.query(query1);
-        const query = `call InsertProductWithCannedFood( "${product.name}" , ${product.pp}, ${product.sp} , "${product.expiry}" , ${product.weight} ) `
+        const query = 'CALL InsertProductWithCannedFood(?, ?, ?, ?, ?)';
         console.log(query);
-        const [rows , fields ] = await mysqlPromisePool.query(query);
+
+        const [rows , fields ] = await mysqlPromisePool.query(query, [
+            product.name,
+            product.pp,
+            product.sp,
+            product.expiry,
+            product.weight
+          ]);
         return res.status(200).end();
     }
     catch(err){
@@ -113,8 +135,13 @@ productRouter.post("/toys" , async (req , res) =>{
         // const [rows , fields ] = await mysqlPromisePool.query(query);
         // const query1 = `insert into toys values (${rows.insertId} , ${product.age_restriction} )`;
         // const [rows1 , fields1 ] = await mysqlPromisePool.query(query1);
-        const query = `call InsertProductWithToys( "${product.name}" , ${product.pp} , ${product.sp} , ${product.age_restriction}) `
-        const [rows , fields ] = await mysqlPromisePool.query(query);
+        const query = 'CALL InsertProductWithToys(?, ?, ?, ?)';
+        const [rows , fields ] = await mysqlPromisePool.query(query , [
+            product.name,
+            product.pp,
+            product.sp,
+            product.age_restriction
+          ]);
         return res.status(200).end();
     }
     catch(err){
