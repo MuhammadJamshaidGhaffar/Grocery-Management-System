@@ -9,7 +9,15 @@ import { mysqlPromisePool } from "../mysql_connection.js";
 export const vendorRouter = Router();
 
 vendorRouter.get("/" ,async (req , res)=>{
-    const [rows , fields ] = await mysqlPromisePool.query("select firstName , lastName , City , Contact , product_id from vendor left join purchasereport on vendor.id = purchasereport.vendor_id");
+    const [rows , fields ] = await mysqlPromisePool.query("select id , firstName , lastName , City , province , Contact  from vendor ");
+    return res.json(rows)
+})
+
+
+vendorRouter.get("/:id" ,async (req , res)=>{
+    const query = `select id ,firstName , lastName , City , province , Contact  from vendor  where vendor.id=${req.params.id}`;
+    console.log(query);
+    const [rows , fields ] = await mysqlPromisePool.query(query);
     return res.json(rows)
 })
 
@@ -39,6 +47,7 @@ vendorRouter.put("/" , async (req , res) =>{
 
     try{
         const query = `update vendor set firstName = "${vendor.firstName}"  , lastName = "${vendor.lastName}" , City = "${vendor.city}" , Province = "${vendor.province}" , Contact = "${vendor.contact}" where id = ${vendor.id}`;
+        console.log(query);
         const [rows , fields ] = await mysqlPromisePool.query(query);
         
         vendor.products.forEach(async (product) => {
