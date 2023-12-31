@@ -17,17 +17,17 @@ purchaseInvoiceRouter.get("/" ,async (req , res)=>{
 
 purchaseInvoiceRouter.get("/:id" , async (req , res)=>{
     try{
-    // const [rows , fields ] = await mysqlPromisePool.query(`select Date , Name as vendorName , mode from purchase_invoice join vendor on purchase_invoice.vendor_id = vendor.id where purchase_invoice.id =${req.params.id}`);
-    const query = `select * from viewpurchaseinvoice where id=${req.params.id}`;
-    const [rows , fields ] = await mysqlPromisePool.query(query);
-    const purchase_invoice = rows[0];
-    // console.log(purchase_invoice);
-    const [rows1 , fields1 ] = await mysqlPromisePool.query(`select * from purchase_invoice_products where purchase_invoice_id =${req.params.id}`);
-    purchase_invoice.products = rows1.map(purchaseInvoiceProduct => {
-        return {"product_id" : purchaseInvoiceProduct.product_id , "quantity" : purchaseInvoiceProduct.quantity };
-    })
-    // console.log(purchase_invoice);
-    return res.json(purchase_invoice)
+        // const [rows , fields ] = await mysqlPromisePool.query(`select Date , Name as vendorName , mode from purchase_invoice join vendor on purchase_invoice.vendor_id = vendor.id where purchase_invoice.id =${req.params.id}`);
+        const query = `select * from viewpurchaseinvoice where id=${req.params.id}`;
+        const [rows , fields ] = await mysqlPromisePool.query(query);
+        const purchase_invoice = rows[0];
+        // console.log(purchase_invoice);
+        const [rows1 , fields1 ] = await mysqlPromisePool.query(`select * from purchase_invoice_products where purchase_invoice_id =${req.params.id}`);
+        purchase_invoice.products = rows1.map(purchaseInvoiceProduct => {
+            return {"product_id" : purchaseInvoiceProduct.product_id , "quantity" : purchaseInvoiceProduct.quantity };
+        })
+        // console.log(purchase_invoice);
+        return res.json(purchase_invoice)
     }
     catch(err){
         res.status(404).json({"message":err.message});
@@ -38,6 +38,7 @@ purchaseInvoiceRouter.post("/" , async (req , res) =>{
     const purchaseInvoice = req.body; 
 
     try{
+        //--------- creating purchase invoice ----------------
         const query = `insert into purchase_invoice (Date , vendor_id , mode ) values ('${purchaseInvoice.date}' , ${purchaseInvoice.vendor_id} , '${purchaseInvoice.mode}'); `;
         const [rows , fields ] = await mysqlPromisePool.query(query);
         const purchase_invoice_id = rows.insertId;

@@ -39,6 +39,19 @@ saleInvoiceRouter.post("/" , async (req , res) =>{
     const saleInvoice = req.body; 
 
     try{
+
+        //--------- checking if product exists -------------
+        for(const product of saleInvoice.products){
+            const getProductsQuantityQuery = `select id , quantity from product where id=${product.id}`;
+            const [productQuantityRows , productsQuantityFields ] = await mysqlPromisePool.query(getProductsQuantityQuery);
+            const fetchedProduct = productQuantityRows[0];
+            // console.log(fetchedProduct);
+            if(fetchedProduct.quantity < product.quantity){
+                return res.status(404).json({"message" : `Product not available.\nproduct id = ${product.id} , Requested Quanity=${product.quantity}  , Available Quantity = ${fetchedProduct.quantity}`})
+            }
+        }
+
+        //--------------- creating sale invoice -------------------------
         const query = `insert into sale_invoice (Date , customer_id , mode ) values ('${saleInvoice.date}' , ${saleInvoice.customer_id} , '${saleInvoice.mode}'); `;
         const [rows , fields ] = await mysqlPromisePool.query(query);
         const sale_invoice_id = rows.insertId;

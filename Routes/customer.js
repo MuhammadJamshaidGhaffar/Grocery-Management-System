@@ -11,7 +11,7 @@ export const customerRouter = Router();
 customerRouter.get("/" ,async (req , res)=>{
     console.log("GET /customer called");
     // const [rows , fields ] = await mysqlPromisePool.query("select * from customer left join acc_r on customer.id = acc_r.customer_id");
-    const query = `select * from aLL_customers`;
+    const query = `select * from view_all_cusotmers`;
     const [rows , fields ] = await mysqlPromisePool.query(query);
     return res.json(rows)
 })
@@ -19,7 +19,7 @@ customerRouter.get("/" ,async (req , res)=>{
 customerRouter.get("/:id" , async (req , res)=>{
     try{
     // const [rows , fields ] = await mysqlPromisePool.query(`select * from customer where id=${req.params.id}`);
-    const query = `select * from aLL_customers where id=${req.params.id}`;
+    const query = `select * from view_all_cusotmers where id=${req.params.id}`;
     const [rows , fields ] = await mysqlPromisePool.query(query);
     return res.json(rows)
     }
